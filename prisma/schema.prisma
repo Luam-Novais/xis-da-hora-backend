@@ -5,11 +5,20 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User{
+  id    Int    @id @default(autoincrement())
+  name String @db.VarChar(255)
+  email String @db.VarChar(50) @unique
+  phone String @db.VarChar(20)
+  address String @db.Text
+  cep String @db.VarChar(20)
+  password String @db.Text
 }
