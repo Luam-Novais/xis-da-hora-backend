@@ -1,14 +1,13 @@
 import prisma from '../config/prisma.js';
-import type { IUser } from '../types/User.js';
+import type { IUser} from '../types/User.js';
 import { ErrorHandlerHttp } from '../error/errorHandlerHttp.js';
 export class UserRepository {
-  async findByEmail(user: IUser): Promise<IUser | null> {
-    const emailExisting = await prisma.user.findUnique({ where: { email: user.email } });
+  async findByEmail(email: string): Promise<IUser | null> {
+    const emailExisting = await prisma.user.findUnique({ where: { email: email } });
     return emailExisting;
   }
-  async login() {}
   async register(user: IUser): Promise<IUser | Error > {
-    const emailExisting = await this.findByEmail(user);
+    const emailExisting = await this.findByEmail(user.email);
     if (emailExisting) return new ErrorHandlerHttp(400, 'Email ja cadastrado!')
     const registeredUser = await prisma.user.create({
       data: {
