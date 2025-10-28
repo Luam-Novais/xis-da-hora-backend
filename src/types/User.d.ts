@@ -7,3 +7,7 @@ export interface IUser {
     phone: string
     cep: string
 }
+export interface userCredentials {
+    email: string,
+    password: string
+}
