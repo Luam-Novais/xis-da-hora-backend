@@ -1,4 +1,16 @@
+import express from 'express'
 import dotenv from 'dotenv'
+import userRouter from './routes/userRouter.js'
+import { errorHttpMiddleware } from './middleware/errorHttpMiddleware.js'
+
 dotenv.config()
-const porta = process.env.DATABASE_URL;
-console.log(porta)
+const app = express()
+app.use(express.urlencoded())
+app.use(express.json())
+app.use('/user', userRouter)
+
+
+
+
+app.use(errorHttpMiddleware)
+app.listen(3000, ()=> console.log('Servidor rodando...'))
