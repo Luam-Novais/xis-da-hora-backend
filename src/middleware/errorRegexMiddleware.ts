@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { IUser } from '../types/User.js';
+import type { IUser } from '../types/user.js';
 import { ValidadeRegex } from '../utils/validateRegex.js';
 import type { regexKey } from '../utils/validateRegex.js';
 import { ErrorHandlerHttp } from '../error/errorHandlerHttp.js';
@@ -13,8 +13,8 @@ export async function errorRegexMiddleware(req: Request<{}, {}, IUser>, res: Res
     if (!valueToValidate) continue;
     const fieldValidate = validate(field as regexKey, valueToValidate);
     if (fieldValidate instanceof Error) {
-      return res.status(400).json({field, fieldValidate: fieldValidate.message})
+      return res.status(400).json({ field, fieldValidate: fieldValidate.message });
     }
-  } next();
-
+  }
+  next();
 }

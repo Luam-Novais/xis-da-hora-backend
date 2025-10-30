@@ -1,4 +1,4 @@
-import type { IEditUser, IUser, IUserCredentials } from '../types/User.js';
+import type { IEditUser, IUser, IUserCredentials } from '../types/user.js';
 import { UserRepository } from '../repository/userRepository.js';
 import { FormaterString } from '../utils/formaterString.js';
 import jwt from 'jsonwebtoken';

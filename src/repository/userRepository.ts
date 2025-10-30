@@ -1,5 +1,5 @@
 import prisma from '../config/prisma.js';
-import type { IEditUser, IUser} from '../types/User.js';
+import type { IEditUser, IUser } from '../types/user.js';
 
 export class UserRepository {
   async findByEmail(email: string): Promise<IUser | null> {
@@ -23,15 +23,15 @@ export class UserRepository {
     });
     return registeredUser;
   }
-  async update(user: IEditUser, userId :number):Promise<IEditUser>{
+  async update(user: IEditUser, userId: number): Promise<IEditUser> {
     const editUser = await prisma.user.update({
-      where: { id: userId  as number },
+      where: { id: userId as number },
       data: { ...user },
     });
-    return editUser
+    return editUser;
   }
-  async delete(userId: number){
-    const deletedUser = await prisma.user.delete({where:{ id: userId}})
-    return deletedUser
+  async delete(userId: number) {
+    const deletedUser = await prisma.user.delete({ where: { id: userId } });
+    return deletedUser;
   }
 }

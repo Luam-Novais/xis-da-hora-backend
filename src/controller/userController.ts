@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
 import { UserRepository } from '../repository/userRepository.js';
-import jwt, {type JwtPayload} from 'jsonwebtoken';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { UserService } from '../service/userService.js';
-import type { IEditUser, IUser, IUserCredentials, IUserPayload } from '../types/User.js';
+import type { IEditUser, IUser, IUserCredentials, IUserPayload } from '../types/user.js';
 import { formaterToken } from '../utils/FormatedToken.js';
 
 const userRepository = new UserRepository();
@@ -39,7 +39,7 @@ export class UserController {
     if (!token) return res.status(401).json('Por favor efetue o login.');
     const decode = jwt.decode(token) as JwtPayload & IUserPayload;
     console.log(decode);
-    const editedUser = await userService.updateUser(user, decode.id) ;
+    const editedUser = await userService.updateUser(user, decode.id);
     if (editedUser instanceof Error) return res.status(400).json(editedUser.message);
     res.status(200).json('Usuário editado com sucesso!');
   }
