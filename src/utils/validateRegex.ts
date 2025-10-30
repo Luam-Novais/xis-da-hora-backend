@@ -2,7 +2,7 @@ import { error } from 'console';
 import test from 'node:test';
 import { ErrorHandlerHttp } from '../error/errorHandlerHttp.js';
 
-type regexKey = keyof typeof typesRegex;
+export type regexKey = keyof typeof typesRegex;
 
 const typesRegex = {
   email: {
