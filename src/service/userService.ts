@@ -27,23 +27,16 @@ export class UserService {
   async register(user: IUser): Promise<IUser | object | Error> {
     const emailExisting = await this.userRepository.findByEmail(user.email);
     if (emailExisting) return new ErrorHandlerHttp(400, 'Email ja cadastrado!');
-    const userFormated: IUser = {
-      name: formatString(user.name),
-      email: formatString(user.email),
-      phone: formatString(user.phone),
-      address: formatString(user.address),
-      cep: formatString(user.cep).replace('-', '').replace('.', ''),
-      password: bcrypt.hashSync(user.password, 10),
-    };
-    const registeredUser = await this.userRepository.register(userFormated);
-    if (registeredUser instanceof Error) return registeredUser;
+    const userFormated: IUser = this.userFormater(user);
+    const userCreated = await this.userRepository.register(userFormated);
+    if (userCreated instanceof Error) return userCreated;
     else {
       const payload = {
-        id: registeredUser.id,
-        name: registeredUser.name,
+        id: userCreated.id,
+        name: userCreated.name,
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
-      return { registeredUser, token };
+      return { userCreated, token };
     }
   }
   async updateUser(user: IEditUser, userId: number): Promise<IEditUser | Error> {
@@ -57,5 +50,15 @@ export class UserService {
     if (typeof userExisting === null) return new ErrorHandlerHttp(400, 'Usuário não encontrado');
     const deletedUser = await this.userRepository.delete(Number(userId));
     return deletedUser;
+  }
+  private userFormater(user: IUser): IUser {
+    return {
+      name: formatString(user.name),
+      email: formatString(user.email),
+      phone: formatString(user.phone),
+      address: formatString(user.address),
+      cep: formatString(user.cep).replace('-', '').replace('.', ''),
+      password: bcrypt.hashSync(user.password, 10),
+    };
   }
 }
