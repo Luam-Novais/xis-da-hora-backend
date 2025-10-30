@@ -1,6 +1,6 @@
 import prisma from '../config/prisma.js';
 import type { IEditUser, IUser} from '../types/User.js';
-import { ErrorHandlerHttp } from '../error/errorHandlerHttp.js';
+
 export class UserRepository {
   async findByEmail(email: string): Promise<IUser | null> {
     const emailExisting = await prisma.user.findUnique({ where: { email: email } });
