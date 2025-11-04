@@ -16,12 +16,7 @@ enum Role {
   ADMIN
   USER
 }
-enum ProductCategory {
-  LANCHES
-  PORCAO
-  BEBIDAS
-  OUTROS
-}
+
 enum StatusOrder {
   PENDENTE
   EM_PREPARO
@@ -47,6 +42,13 @@ model Product{
   price Decimal @db.Decimal(10, 2)
   imageUrl String?
   orders ItemsOnOrders[]
+  categoryName String
+  category Category @relation(fields: [categoryName], references: [name])
+}
+model Category{
+  id Int @unique @default(autoincrement())
+  name String @id @db.VarChar(50) 
+  product Product[]
 }
 
 model Order{
