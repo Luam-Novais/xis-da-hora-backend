@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
 import { ProductRepository } from '../repository/productRepository.js';
 import { ProductService } from '../service/productService.js';
-import { ErrorHandlerHttp } from '../error/errorHandlerHttp.js';
 
 const productRepository = new ProductRepository();
 const productService = new ProductService(productRepository);
