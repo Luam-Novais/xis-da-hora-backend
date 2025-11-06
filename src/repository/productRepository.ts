@@ -14,10 +14,22 @@ export class ProductRepository {
       const products = await prisma.product.findMany({
         where: { categoryName: category },
       });
-      return products;
+      return products
     } catch (error) {
       console.log(error);
       return new Error('Ocorreu um erro ao buscar dados no banco de dados.');
     }
+  }
+  async createProduct(product: IProduct) {
+    const createdProduct = await prisma.product.create({
+      data: {
+        name: product.name,
+        price: product.price as number,
+        description: product.description,
+        imageURL: product.imageURL as string,
+        categoryName: product.categoryName
+      }
+    })
+    return createdProduct
   }
 }
