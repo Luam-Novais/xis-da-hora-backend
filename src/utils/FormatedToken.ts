@@ -1,3 +1,3 @@
-export function formaterToken(token: string){
-    return token.split(' ')[1]
+export function formaterToken(token: string): string{
+    return token.split(' ')[1] as string
 }

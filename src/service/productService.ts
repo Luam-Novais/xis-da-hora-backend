@@ -1,11 +1,9 @@
 import type { IProduct, ProductImage } from '../types/product.js';
-import { ErrorHandlerHttp } from '../error/errorHandlerHttp.js';
 import type { ProductRepository } from '../repository/productRepository.js';
 import { FormaterString } from '../utils/formaterString.js';
 import type { UploadApiResponse } from 'cloudinary';
 import sharp from 'sharp';
 import cloudinary from '../config/cloudinary.js';
-import Stream from 'stream';
 
 const { formatString } = new FormaterString();
 export class ProductService {
@@ -13,21 +11,21 @@ export class ProductService {
   async getProductsByCategory(category: string): Promise<IProduct[] | null | Error> {
     try {
       const categoryExisting = await this.productRepository.findCategory(category);
-      if (!categoryExisting) return new ErrorHandlerHttp(400, 'Categoria inválida.');
+      if (!categoryExisting) throw new Error('Categoria inválida.')
       const products = await this.productRepository.getByCategory(category);
       return products;
     } catch (error) {
-      console.log(error);
-      return new Error('Ocorreu um erro em nosso serivdor ao buscar os dados!');
+      console.error(error);
+      return new Error('Ocorreu um erro em nosso serivdor ao buscar os dados.');
     }
   }
   async createProduct(product: IProduct, file: ProductImage) {
     try {
       const categoryExisting = await this.productRepository.findCategory(product.categoryName);
-      if (!categoryExisting) return new Error('Categoria não encontrada.');
-      if (product.price <= 0) return new Error('O valor do produto está inválido.');
+      if (!categoryExisting) throw new Error('Categoria não encontrada.');
+      if (product.price <= 0) throw new Error('O valor do produto está inválido.');
       const imageResizeAndUpload = await this.uploadAndResizeImage(file);
-      if (typeof imageResizeAndUpload === 'undefined') return new Error('Falha ao cadastrar a imagem.');
+      if (typeof imageResizeAndUpload === 'undefined') throw new Error('Falha ao cadastrar a imagem.');
 
       const productFormated = {
         name: formatString(product.name),
@@ -53,7 +51,7 @@ export class ProductService {
         stream.end(resizedImage)
       });
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 }

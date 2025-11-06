@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
 import { ProductRepository } from '../repository/productRepository.js';
 import { ProductService } from '../service/productService.js';
-import { rmSync } from 'fs';
 import type { IProduct } from '../types/product.js';
 
 const productRepository = new ProductRepository();
@@ -13,14 +12,23 @@ export class ProductController {
   async getProductsByCategory(req: Request, res: Response) {
     const { category } = req.query;
     if (typeof category !== 'string') return res.status(400).json({ message: 'Query inválida.' });
-    const products = await productService.getProductsByCategory(category);
-    if(products instanceof Error) res.status(400).json(products.message)
-    res.status(200).json(products)
+    try {
+      const products = await productService.getProductsByCategory(category);
+      res.status(200).json(products);
+    } catch (error : any) {
+      res.status(400).json(error.message);
+    }
   }
-  async createProduct(req: Request<{}, {}, IProduct>, res: Response){
-    if(!req.file) return res.status(400).json({message: 'Arquivo de imagem não enviado.'})
-    const createdProduct = await productService.createProduct(req.body, req.file)
-    if(createdProduct instanceof Error) return res.status(400).json(createdProduct.message)
-      res.status(201).json(createdProduct)
+  async createProduct(req: Request<{}, {}, IProduct>, res: Response) {
+    if (!req.file) return res.status(400).json({ message: 'Arquivo de imagem não enviado.' });
+    try {
+      const createdProduct = await productService.createProduct(req.body, req.file);
+      res.status(201).json(createdProduct);
+    } catch (error: any) {
+      return res.status(400).json(error.message);
+    }
+  }
+  async deleteProduct(req: Request, res: Response) {
+    const { id } = req.params;
   }
 }
