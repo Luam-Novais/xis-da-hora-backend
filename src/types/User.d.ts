@@ -6,6 +6,7 @@ export interface IUser {
     address: string,
     phone: string
     cep: string
+    role: string
 }
 export interface IEditUser {
   id: number;
