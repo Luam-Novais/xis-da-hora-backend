@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { ErrorHandlerHttp } from '../error/errorHandlerHttp.js';
 
+
 const { formatString } = new FormaterString();
 
 export class UserService {
@@ -17,6 +18,7 @@ export class UserService {
       const payload = {
         id: userExisting.id,
         name: userExisting.name,
+        role: userExisting.role
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
       return { token };
@@ -34,6 +36,7 @@ export class UserService {
       const payload = {
         id: userCreated.id,
         name: userCreated.name,
+        role: userCreated.role
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
       return { userCreated, token };
@@ -58,6 +61,7 @@ export class UserService {
       phone: formatString(user.phone),
       address: formatString(user.address),
       cep: formatString(user.cep).replace('-', '').replace('.', ''),
+      role: user.role,
       password: bcrypt.hashSync(user.password, 10),
     };
   }
