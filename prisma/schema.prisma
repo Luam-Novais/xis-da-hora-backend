@@ -40,7 +40,7 @@ model Product{
   name String @db.VarChar(50)
   description String @db.Text
   price Decimal @db.Decimal(10, 2)
-  imageUrl String?
+  imageURL String @db.Text
   orders ItemsOnOrders[]
   categoryName String
   category Category @relation(fields: [categoryName], references: [name])
