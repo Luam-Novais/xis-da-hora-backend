@@ -3,6 +3,7 @@ export interface IProduct{
     name: string
     description: string
     price: Decimal | number
-    imageURl?: string
+    imageURL: string
     categoryName: string
 }
+type ProductImage = Express.Multer.File
