@@ -6,14 +6,13 @@ import bcrypt from 'bcrypt';
 import { HttpError } from '../error/httpError.js';
 
 const { formatString } = new FormaterString();
-
 export class UserService {
   constructor(private userRepository: UserRepository) {}
   async login(user: IUserCredentials) {
     const userExisting = await this.userRepository.findByEmail(user.email);
     if (userExisting) {
-      const comparePassword = bcrypt.compareSync(user.password, userExisting.password);
-      if (!comparePassword) return new HttpError(400, 'Credenciais inválidas.');
+      const comparePassword = await bcrypt.compare(user.password, userExisting.password);
+      if (!comparePassword) throw new HttpError(400, 'Credenciais inválidas.');
       const payload = {
         id: userExisting.id,
         name: userExisting.name,
@@ -22,16 +21,16 @@ export class UserService {
       const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
       return { token };
     } else {
-      return new HttpError(400, 'Credenciais inválidas.');
+      throw new HttpError(401, 'Credenciais inválidas.');
     }
   }
-  async register(user: IUser): Promise<IUser | object | Error> {
+  async register(user: IUser){
     const emailExisting = await this.userRepository.findByEmail(user.email);
-    if (emailExisting) return new HttpError(400, 'Email ja cadastrado!');
-    const userFormated: IUser = this.userFormater(user);
-    const userCreated = await this.userRepository.register(userFormated);
-    if (userCreated instanceof Error) return userCreated;
-    else {
+    if (emailExisting) throw new HttpError(400, 'Email ja cadastrado!');
+    const userFormated = await this.userFormater(user);
+    try {
+      const userCreated = await this.userRepository.register(userFormated);
+      if (userCreated instanceof Error) throw new HttpError(500, 'Falha ao criar usuário.');
       const payload = {
         id: userCreated.id,
         name: userCreated.name,
@@ -39,21 +38,29 @@ export class UserService {
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
       return { userCreated, token };
+    } catch (error: any) {
+      console.error(error);
+      throw new HttpError(400, error.message);
     }
   }
   async updateUser(user: IEditUser, userId: number): Promise<IEditUser | Error> {
     const userExisting = await this.userRepository.findById(userId);
-    if (typeof userExisting === null) return new HttpError(400, 'Usuário não encontrado');
+    if (!userExisting) throw new HttpError(400, 'Usuário não encontrado');
     const editedUser = await this.userRepository.update(user, userId);
     return editedUser;
   }
   async delete(userId: string): Promise<IUser | Error | null> {
     const userExisting = await this.userRepository.findById(Number(userId));
-    if (typeof userExisting === null) return new HttpError(400, 'Usuário não encontrado');
-    const deletedUser = await this.userRepository.delete(Number(userId));
-    return deletedUser;
+    if (!userExisting) throw new HttpError(400, 'Usuário não encontrado');
+    try {
+      const deletedUser = await this.userRepository.delete(Number(userId));
+      return deletedUser;
+    } catch (error: any) {
+      console.error(error);
+      throw new HttpError(400, error.message);
+    }
   }
-  private userFormater(user: IUser): IUser {
+  private async userFormater(user: IUser): Promise<IUser> {
     return {
       name: formatString(user.name),
       email: formatString(user.email),
@@ -61,7 +68,7 @@ export class UserService {
       address: formatString(user.address),
       cep: formatString(user.cep).replace('-', '').replace('.', ''),
       role: user.role,
-      password: bcrypt.hashSync(user.password, 10),
+      password: await bcrypt.hash(user.password, 10),
     };
   }
 }

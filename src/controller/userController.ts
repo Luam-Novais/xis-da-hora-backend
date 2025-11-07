@@ -4,6 +4,7 @@ import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { UserService } from '../service/userService.js';
 import type { IEditUser, IUser, IUserCredentials, IUserPayload } from '../types/user.js';
 import { formaterToken } from '../utils/FormatedToken.js';
+import { HttpError } from '../error/httpError.js';
 
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
@@ -13,25 +14,28 @@ export class UserController {
     const { email, password } = req.body;
     if (!email || !password) res.status(400).json('Por favor nos informe os dados necessários.');
     const userCredentials: IUserCredentials = { email, password };
-    const loginUser = await userService.login(userCredentials);
-    if (loginUser instanceof Error) res.status(401).json(loginUser.message);
-    res.status(200).json(loginUser);
+   try {
+       const loginUser = await userService.login(userCredentials);
+       res.status(200).json(loginUser);
+   } catch (error:any) {
+      console.error(error.message)
+      res.status(error.status).json(error.message);
+   }
   }
   async register(req: Request<{}, {}, IUser>, res: Response) {
     const { name, email, phone, address, password, cep } = req.body;
-    if (name && email && phone && address && password && cep) {
-      const user = {
-        name,
-        email,
-        phone,
-        address,
-        password,
-        cep,
-      };
-      const registerUser = await userService.register(user);
-      if (registerUser instanceof Error) res.status(400).json(registerUser.message);
-      res.status(201).json(registerUser);
-    }
+    if (!name || !email || !phone || !address || !password || !cep) throw new HttpError(400, 'Por favor preencha todos os dados.')
+      try {
+        const user = {
+          ...req.body,
+          role: 'USER',
+        };
+        const registerUser = await userService.register(user);
+        res.status(201).json(registerUser);
+      } catch (error: any) {
+        console.error(error)
+        res.status(error.status).json(error.message)
+      }
   }
   async updateUser(req: Request<{}, {}, IEditUser>, res: Response) {
     const user = req.body;
