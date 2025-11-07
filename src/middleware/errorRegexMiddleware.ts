@@ -2,7 +2,6 @@ import type { Request, Response, NextFunction } from 'express';
 import type { IUser } from '../types/user.js';
 import { ValidadeRegex } from '../utils/validateRegex.js';
 import type { regexKey } from '../utils/validateRegex.js';
-import { ErrorHandlerHttp } from '../error/errorHandlerHttp.js';
 
 const { validate } = new ValidadeRegex();
 

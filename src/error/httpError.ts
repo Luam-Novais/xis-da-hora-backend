@@ -1,4 +1,4 @@
-export class ErrorHandlerHttp extends Error{
+export class HttpError extends Error{
     status: number
     constructor(status: number, error: string){
         super(error)

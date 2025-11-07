@@ -1,6 +1,4 @@
-import { error } from 'console';
-import test from 'node:test';
-import { ErrorHandlerHttp } from '../error/errorHandlerHttp.js';
+
 
 export type regexKey = keyof typeof typesRegex;
 
@@ -25,10 +23,10 @@ const typesRegex = {
 
 export class ValidadeRegex {
   validate(type: regexKey, data: string): boolean | Error {
-     if(!typesRegex[type].regex.test(data)){
-      return new Error(typesRegex[type].messageError)
-    }else{
-      return true
+    if (!typesRegex[type].regex.test(data)) {
+      return new Error(typesRegex[type].messageError);
+    } else {
+      return true;
     }
   }
 }
