@@ -16,16 +16,16 @@ export class ProductController {
       const products = await productService.getProductsByCategory(category);
       res.status(200).json(products);
     } catch (error : any) {
-      res.status(400).json(error.message);
+      res.status(400).json({messageError: error.message});
     }
   }
   async createProduct(req: Request<{}, {}, IProduct>, res: Response) {
-    if (!req.file) return res.status(400).json({ message: 'Arquivo de imagem não enviado.' });
+    if (!req.file) return res.status(400).json({ messageError: 'Arquivo de imagem não enviado.' });
     try {
       const createdProduct = await productService.createProduct(req.body, req.file);
       res.status(201).json(createdProduct);
     } catch (error: any) {
-      return res.status(400).json(error.message);
+      return res.status(error.status).json({messageError :error.message});
     }
   }
   async deleteProduct(req: Request, res: Response) {

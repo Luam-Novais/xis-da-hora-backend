@@ -4,28 +4,29 @@ import { FormaterString } from '../utils/formaterString.js';
 import type { UploadApiResponse } from 'cloudinary';
 import sharp from 'sharp';
 import cloudinary from '../config/cloudinary.js';
+import { HttpError } from '../error/httpError.js';
 
 const { formatString } = new FormaterString();
 export class ProductService {
   constructor(private productRepository: ProductRepository) {}
   async getProductsByCategory(category: string): Promise<IProduct[] | null | Error> {
+    const categoryExisting = await this.productRepository.findCategory(category);
+    if (!categoryExisting) throw new HttpError(400, 'Categoria inválida.')
     try {
-      const categoryExisting = await this.productRepository.findCategory(category);
-      if (!categoryExisting) throw new Error('Categoria inválida.')
       const products = await this.productRepository.getByCategory(category);
       return products;
     } catch (error) {
       console.error(error);
-      return new Error('Ocorreu um erro em nosso serivdor ao buscar os dados.');
+      return new HttpError(400, 'Ocorreu um erro em nosso serivdor ao buscar os dados.');
     }
   }
   async createProduct(product: IProduct, file: ProductImage) {
+    const categoryExisting = await this.productRepository.findCategory(product.categoryName);
+    if (!categoryExisting) throw new HttpError(400, 'Categoria não encontrada.');
     try {
-      const categoryExisting = await this.productRepository.findCategory(product.categoryName);
-      if (!categoryExisting) throw new Error('Categoria não encontrada.');
-      if (product.price <= 0) throw new Error('O valor do produto está inválido.');
+      if (product.price <= 0) throw new HttpError(400, 'O valor do produto está inválido.');
       const imageResizeAndUpload = await this.uploadAndResizeImage(file);
-      if (typeof imageResizeAndUpload === 'undefined') throw new Error('Falha ao cadastrar a imagem.');
+      if (typeof imageResizeAndUpload === 'undefined') throw new HttpError(400, 'Falha ao cadastrar a imagem.');
 
       const productFormated = {
         name: formatString(product.name),
@@ -36,8 +37,9 @@ export class ProductService {
       };
       const createdProduct = await this.productRepository.createProduct(productFormated);
       return createdProduct;
-    } catch (error) {
-      console.log(error);
+    } catch (error : any) {
+      console.error(error);
+      throw new HttpError(400, error.message)
     }
   }
   private async uploadAndResizeImage(file: ProductImage): Promise<UploadApiResponse| undefined> {

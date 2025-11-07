@@ -1,7 +1,7 @@
-import type { Category, Product } from '@prisma/client';
+import type { Category} from '@prisma/client';
 import prisma from '../config/prisma.js';
 import type { IProduct } from '../types/product.js';
-import { ErrorHandlerHttp } from '../error/errorHandlerHttp.js';
+import { HttpError } from '../error/httpError.js';
 
 export class ProductRepository {
   async findCategory(category: string): Promise<Category | null> {
@@ -9,27 +9,30 @@ export class ProductRepository {
   }
   async getByCategory(category: string): Promise<IProduct[] | Error> {
     try {
-      const categoryExisting = await this.findCategory(category);
-      if (!categoryExisting) return new Error('Categoria inválida.');
       const products = await prisma.product.findMany({
         where: { categoryName: category },
       });
-      return products
-    } catch (error) {
-      console.log(error);
-      return new Error('Ocorreu um erro ao buscar dados no banco de dados.');
+      return products;
+    } catch (error: any) {
+      console.error(error.message);
+      throw new Error(error.message)
     }
   }
   async createProduct(product: IProduct) {
-    const createdProduct = await prisma.product.create({
-      data: {
-        name: product.name,
-        price: product.price as number,
-        description: product.description,
-        imageURL: product.imageURL as string,
-        categoryName: product.categoryName
-      }
-    })
-    return createdProduct
+    try {
+      const createdProduct = await prisma.product.create({
+        data: {
+          name: product.name,
+          price: product.price as number,
+          description: product.description,
+          imageURL: product.imageURL as string,
+          categoryName: product.categoryName,
+        },
+      });
+      return createdProduct;
+    } catch (error: any) {
+      console.error(error.message)
+      throw new HttpError(400, error.message)
+    }
   }
 }
