@@ -1,7 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import userRouter from './routes/userRouter.js'
-import productRouter from './routes/productRoutes.js'
+import productRouter from './routes/productRouter.js'
 import { errorHandler } from './middleware/errorHandler.js'
 
 

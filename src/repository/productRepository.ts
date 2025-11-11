@@ -1,11 +1,16 @@
-import type { Category} from '@prisma/client';
+import type { Category, Product } from '@prisma/client';
 import prisma from '../config/prisma.js';
-import type { IProduct } from '../types/product.js';
+import type { IEditProduct, IProduct } from '../types/product.js';
 import { HttpError } from '../error/httpError.js';
 
 export class ProductRepository {
   async findCategory(category: string): Promise<Category | null> {
     return await prisma.category.findUnique({ where: { name: category } });
+  }
+  async findProductById(id: number): Promise<Product | null> {
+    return await prisma.product.findUnique({
+      where: { id: id },
+    });
   }
   async getByCategory(category: string): Promise<IProduct[] | Error> {
     try {
@@ -15,7 +20,7 @@ export class ProductRepository {
       return products;
     } catch (error: any) {
       console.error(error.message);
-      throw new Error(error.message)
+      throw new Error(error.message);
     }
   }
   async createProduct(product: IProduct) {
@@ -27,12 +32,34 @@ export class ProductRepository {
           description: product.description,
           imageURL: product.imageURL as string,
           categoryName: product.categoryName,
+          imageId:product.imageId
         },
       });
       return createdProduct;
     } catch (error: any) {
-      console.error(error.message)
-      throw new HttpError(400, error.message)
+      console.error(error.message);
+      throw new HttpError(400, error.message);
+    }
+  }
+  async updateProduct(productId: number, product: IEditProduct) {
+    try {
+      return await prisma.product.update({
+        where: { id: productId },
+        data: { ...product },
+      });
+    } catch (error: any) {
+      console.error(error);
+      throw new Error(error.message);
+    }
+  }
+  async deleteProduct(id: number) {
+    try {
+      return await prisma.product.delete({
+        where: { id: id },
+      });
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message);
     }
   }
 }

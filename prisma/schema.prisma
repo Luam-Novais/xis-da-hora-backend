@@ -41,6 +41,7 @@ model Product{
   description String @db.Text
   price Decimal @db.Decimal(10, 2)
   imageURL String @db.Text
+  imageId String 
   orders ItemsOnOrders[]
   categoryName String
   category Category @relation(fields: [categoryName], references: [name])
