@@ -62,4 +62,13 @@ export class ProductRepository {
       throw new Error(error.message);
     }
   }
+  async getPriceProducts(id:number[]){
+    const products = await prisma.product.findMany({where:{id : {in: id}}})
+    return products.map(item => {
+      return {
+        id: item.id,
+        price: item.price
+      }
+    })
+  }
 }
