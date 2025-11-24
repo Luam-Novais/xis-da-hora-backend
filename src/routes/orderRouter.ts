@@ -4,5 +4,6 @@ import  { OrderController } from "../controller/orderController.js";
 const router = Router()
 const controller = new OrderController()
 router.post('/create-order', (req, res) => controller.createOrder(req, res));
+router.post('/update-status/:id', (req, res)=> controller.updateOrderStatus(req, res))
 
 export default router

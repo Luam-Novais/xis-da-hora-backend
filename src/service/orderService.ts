@@ -1,9 +1,11 @@
 import type { OrderRepository } from '../repository/orderRepository.js';
-import type { IOrderJSON, IProductOrderJSON, ItemsInOrders } from '../types/order.js';
+import type { IOrderJSON, IProductOrderJSON } from '../types/order.js';
 import { HttpError } from '../error/httpError.js';
 import { UserRepository } from '../repository/userRepository.js';
 import { ProductRepository } from '../repository/productRepository.js';
 import type { OrderFormater } from '../utils/orderFormater.js';
+import { orderProgress } from '../utils/orderProgress.js';
+import type { StatusOrder } from '@prisma/client';
 
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
@@ -21,7 +23,7 @@ export class OrderService {
       const createdOrder = await this.orderRepository.createOrder({ total: totalOrder, userId: order.userId });
       if (createdOrder instanceof Error) throw new HttpError(400, 'Ocorreum erro ao criar o pedido.');
       const formatProducts = await this.orderFormater.formaterProduct(order.products, createdOrder);
-      await this.orderRepository.addProducts(formatProducts);
+      await this.orderRepository.addProductsInOrders(formatProducts);
       const completeOrder = await this.orderFormater.formaterAndCompleteOrder(createdOrder);
       return completeOrder;
     } catch (error: any) {
@@ -41,10 +43,26 @@ export class OrderService {
     const getPrices = await productRepository.getPriceProducts(productsIds)
 
     const subtotal = products.reduce((acc, item):number => {
-      const prices = getPrices.find(p => p.id === item.id)
-      if(!prices) throw new Error('Produto não encontrado.')
-      return acc + Math.floor(item.quantity * Number(prices.price))
+      const comparePrices = getPrices.find(p => p.id === item.id)
+      if(!comparePrices) throw new Error('Produto não encontrado.')
+      return acc + Math.floor(item.quantity * Number(comparePrices.price))
     },0)
     return subtotal + shippingCost
+  }
+  async updateOrderStatus(id: number, newStatus: StatusOrder){
+    
+    try{
+      const currentStatus = await this.orderRepository.getOrderById(id);
+      if (!currentStatus) throw new Error('Pedido não encontrado.');
+      if (orderProgress[currentStatus.status].includes(newStatus)) {
+        const updatedOrder = await this.orderRepository.updateOrderStatus(id, newStatus)
+         return updatedOrder
+      }else{
+        throw new Error(`Não foi possível atualizar o status do pedido para ${newStatus}. O status atual é ${currentStatus.status}`)
+      }
+    }catch(error: any){
+      console.log(error)
+      throw new Error(error.message)
+    }
   }
 }

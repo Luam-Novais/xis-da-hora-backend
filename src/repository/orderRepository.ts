@@ -1,8 +1,16 @@
 import type { ICreateOrder, IProductOrderJSON, ItemsInOrders } from '../types/order.js';
 import prisma from '../config/prisma.js';
-import type { Order } from '@prisma/client';
-import { HttpError } from '../error/httpError.js';
+import type { Order, StatusOrder } from '@prisma/client';
+
 export class OrderRepository {
+  async getOrderById(id: number){
+    try {
+      return await prisma.order.findUnique({where:{id: id}})
+    } catch (error:any) {
+      console.log(error)
+      throw new Error(error.message)
+    }
+  }
   async createOrder(order: ICreateOrder): Promise<Order | Error> {
    try {
      return await prisma.order.create({
@@ -13,7 +21,7 @@ export class OrderRepository {
     throw new Error(error.message)
    }
   }
-  async addProducts(data: ItemsInOrders[]){
+  async addProductsInOrders(data: ItemsInOrders[]){
     try {
        return await prisma.itemsOnOrders.createMany({
         data: data
@@ -37,5 +45,18 @@ export class OrderRepository {
         subtotal: item.subtotal
       }
     })
+  }
+  async updateOrderStatus(id: number, newStatus: StatusOrder){
+    try {
+      return await prisma.order.update({
+        where:{id: id},
+        data:{
+          status: newStatus
+        }
+      })
+    } catch (error: any) {
+      console.log(error)
+      throw new Error(error.message)
+    }
   }
 }
