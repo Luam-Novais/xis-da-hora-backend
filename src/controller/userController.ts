@@ -6,8 +6,8 @@ import type { IEditUser, IUser, IUserCredentials, IUserPayload } from '../types/
 import { formaterToken } from '../utils/FormatedToken.js';
 import { HttpError } from '../error/httpError.js';
 
-const userRepository = new UserRepository();
-const userService = new UserService(userRepository);
+const repository = new UserRepository();
+const service = new UserService(repository);
 
 export class UserController {
   async login(req: Request, res: Response) {
@@ -15,7 +15,7 @@ export class UserController {
     if (!email || !password) res.status(400).json('Por favor nos informe os dados necessários.');
     const userCredentials: IUserCredentials = { email, password };
    try {
-       const loginUser = await userService.login(userCredentials);
+       const loginUser = await service.login(userCredentials);
        res.status(200).json(loginUser);
    } catch (error:any) {
       console.error(error.message)
@@ -30,7 +30,7 @@ export class UserController {
           ...req.body,
           role: 'USER',
         };
-        const registerUser = await userService.register(user);
+        const registerUser = await service.register(user);
         res.status(201).json(registerUser);
       } catch (error: any) {
         console.error(error)
@@ -43,13 +43,13 @@ export class UserController {
     if (!token) return res.status(401).json('Por favor efetue o login.');
     const decode = jwt.decode(token) as JwtPayload & IUserPayload;
     console.log(decode);
-    const editedUser = await userService.updateUser(user, decode.id);
+    const editedUser = await service.updateUser(user, decode.id);
     if (editedUser instanceof Error) return res.status(400).json(editedUser.message);
     res.status(200).json('Usuário editado com sucesso!');
   }
   async delete(req: Request, res: Response): Promise<object> {
     const { userId } = req.body;
-    const deletedUser = await userService.delete(userId);
+    const deletedUser = await service.delete(userId);
     if (deletedUser instanceof Error) return res.status(400).json(deletedUser.message);
 
     return res.status(200).json({ deletedUser, message: 'Usuário excluido com sucesso!' });
