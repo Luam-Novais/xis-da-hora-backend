@@ -6,6 +6,7 @@ import { ProductRepository } from '../repository/productRepository.js';
 import type { OrderFormater } from '../utils/orderFormater.js';
 import { orderProgress } from '../utils/orderProgress.js';
 import type { StatusOrder } from '@prisma/client';
+import { stat } from 'fs';
 
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
@@ -49,12 +50,12 @@ export class OrderService {
     },0)
     return subtotal + shippingCost
   }
-  async updateOrderStatus(id: number, newStatus: StatusOrder){
-    
+  async updateOrderStatus(id: number, status: StatusOrder){
+    const newStatus = status.toUpperCase() as StatusOrder
     try{
       const currentStatus = await this.orderRepository.getOrderById(id);
       if (!currentStatus) throw new Error('Pedido não encontrado.');
-      if (orderProgress[currentStatus.status].includes(newStatus)) {
+      if (orderProgress[currentStatus.status].includes(newStatus.toUpperCase())) {
         const updatedOrder = await this.orderRepository.updateOrderStatus(id, newStatus)
          return updatedOrder
       }else{

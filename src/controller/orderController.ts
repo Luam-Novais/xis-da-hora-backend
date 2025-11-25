@@ -23,6 +23,7 @@ export class OrderController{
     async updateOrderStatus(req: Request, res: Response){
         const {id} = req.params
         const {orderStatus} = req.body
+        if(typeof orderStatus !== 'string') res.status(400).json('Erro com o tipo do orderStatus.')
         const updatedOrder = await orderService.updateOrderStatus(Number(id), orderStatus)
         if(updatedOrder instanceof Error) res.status(400).json(updatedOrder.message)
         res.status(200).json({messageSucess: `O Status do pedido foi atualizado para ${updatedOrder?.status}.`, order: updatedOrder}, )
