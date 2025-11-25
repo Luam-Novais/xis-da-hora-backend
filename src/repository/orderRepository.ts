@@ -59,4 +59,7 @@ export class OrderRepository {
       throw new Error(error.message)
     }
   }
+  async getOrdersUser(id:number){
+    return await prisma.order.findMany({where: {userId: id}})
+  }
 }

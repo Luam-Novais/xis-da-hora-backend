@@ -50,6 +50,9 @@ export class OrderService {
     },0)
     return subtotal + shippingCost
   }
+  async getOrdersUser(id:number){
+    return this.orderRepository.getOrdersUser(id)
+  }
   async updateOrderStatus(id: number, status: StatusOrder){
     const newStatus = status.toUpperCase() as StatusOrder
     try{

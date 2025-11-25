@@ -3,6 +3,7 @@ import { OrderService } from "../service/orderService.js";
 import { OrderRepository } from "../repository/orderRepository.js";
 import { OrderFormater } from "../utils/orderFormater.js";
 import type { IOrderJSON } from "../types/order.js";
+import type { RequestWithJWT } from "../types/jwt.js";
 
 
 const orderRepository = new OrderRepository()
@@ -27,5 +28,10 @@ export class OrderController{
         const updatedOrder = await orderService.updateOrderStatus(Number(id), orderStatus)
         if(updatedOrder instanceof Error) res.status(400).json(updatedOrder.message)
         res.status(200).json({messageSucess: `O Status do pedido foi atualizado para ${updatedOrder?.status}.`, order: updatedOrder}, )
+    }
+    async getOrdersUser(req: RequestWithJWT, res: Response){
+        const {userId} = req
+        const ordersUser = await orderService.getOrdersUser(userId as number)
+        res.status(200).json(ordersUser)
     }
 }
