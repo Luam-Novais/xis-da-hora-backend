@@ -6,7 +6,6 @@ import { ProductRepository } from '../repository/productRepository.js';
 import type { OrderFormater } from '../utils/orderFormater.js';
 import { orderProgress } from '../utils/orderProgress.js';
 import type { StatusOrder } from '@prisma/client';
-import { stat } from 'fs';
 
 const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
@@ -40,33 +39,33 @@ export class OrderService {
     }
   }
   private async calcTotalOrder(products: IProductOrderJSON[], shippingCost: number) {
-    const productsIds = products.map((item)=> item.id)
-    const getPrices = await productRepository.getPriceProducts(productsIds)
+    const productsIds = products.map((item) => item.id);
+    const getPrices = await productRepository.getPriceProducts(productsIds);
 
-    const subtotal = products.reduce((acc, item):number => {
-      const comparePrices = getPrices.find(p => p.id === item.id)
-      if(!comparePrices) throw new Error('Produto não encontrado.')
-      return acc + Math.floor(item.quantity * Number(comparePrices.price))
-    },0)
-    return subtotal + shippingCost
+    const subtotal = products.reduce((acc, item): number => {
+      const comparePrices = getPrices.find((p) => p.id === item.id);
+      if (!comparePrices) throw new Error('Produto não encontrado.');
+      return acc + Math.floor(item.quantity * Number(comparePrices.price));
+    }, 0);
+    return subtotal + shippingCost;
   }
-  async getOrdersUser(id:number){
-    return this.orderRepository.getOrdersUser(id)
+  async getOrdersUser(id: number) {
+    return this.orderRepository.getOrdersUser(id);
   }
-  async updateOrderStatus(id: number, status: StatusOrder){
-    const newStatus = status.toUpperCase() as StatusOrder
-    try{
+  async updateOrderStatus(id: number, status: StatusOrder) {
+    const newStatus = status.toUpperCase() as StatusOrder;
+    try {
       const currentStatus = await this.orderRepository.getOrderById(id);
       if (!currentStatus) throw new Error('Pedido não encontrado.');
       if (orderProgress[currentStatus.status].includes(newStatus.toUpperCase())) {
-        const updatedOrder = await this.orderRepository.updateOrderStatus(id, newStatus)
-         return updatedOrder
-      }else{
-        throw new Error(`Não foi possível atualizar o status do pedido para ${newStatus}. O status atual é ${currentStatus.status}`)
+        const updatedOrder = await this.orderRepository.updateOrderStatus(id, newStatus);
+        return updatedOrder;
+      } else {
+        throw new Error(`Não foi possível atualizar o status do pedido para ${newStatus}. O status atual é ${currentStatus.status}`);
       }
-    }catch(error: any){
-      console.log(error)
-      throw new Error(error.message)
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message);
     }
   }
 }
