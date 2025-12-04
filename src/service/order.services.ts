@@ -1,20 +1,20 @@
-import type { OrderRepository } from '../repository/orderRepository.js';
+import type { OrderRepository } from '../repository/order.repository.js';
 import type { IOrderJSON, IProductOrderJSON } from '../types/order.js';
 import { HttpError } from '../error/httpError.js';
-import { UserRepository } from '../repository/userRepository.js';
-import { ProductRepository } from '../repository/productRepository.js';
+import { CustomerRepository } from '../repository/customer.repository.js';
+import { ProductRepository } from '../repository/product.repository.js';
 import type { OrderFormater } from '../utils/orderFormater.js';
 import { orderProgress } from '../utils/orderProgress.js';
 import type { StatusOrder } from '@prisma/client';
 
-const userRepository = new UserRepository();
+const customerRepository = new CustomerRepository();
 const productRepository = new ProductRepository();
 export class OrderService {
   constructor(private orderRepository: OrderRepository, private orderFormater: OrderFormater) {}
 
   async createOrder(order: IOrderJSON) {
-    const userExisting = await userRepository.findById(order.userId);
-    if (!userExisting) throw new HttpError(401, 'Usuário não encontrado.');
+    const customerExisting = await customerRepository.findById(order.userId);
+    if (!customerExisting) throw new HttpError(401, 'Usuário não encontrado.');
     if (order.products.length <= 0) throw new HttpError(400, 'O carrinho não pode estar vazio.');
     try {
       await this.verifyProduct(order.products);

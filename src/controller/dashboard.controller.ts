@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import { DashboardService } from '../service/dashboardService.js';
-import { DashboardRepository } from '../repository/dashboardRepository.js';
+import { DashboardService } from '../service/dashboard.services.js';
+import { DashboardRepository } from '../repository/dashboard.repository.js';
 import { count } from 'console';
 
 const repository = new DashboardRepository();
@@ -42,13 +42,13 @@ export class DashboardController {
       res.status(400).json(error.message);
     }
   }
-  async getTicketMedio(req:Request, res:Response){
+  async getTicketMedio(req: Request, res: Response) {
     try {
-        const ticketMedio = await service.getTicketMedio()
-        res.status(200).json({ messageSucess: 'Ticket Medio baseado nos últimos 30 dias.', ticketMedio});
-    } catch (error:any) {
-          console.error(error);
-          res.status(400).json(error.message);
+      const ticketMedio = await service.getTicketMedio();
+      res.status(200).json({ messageSucess: 'Ticket Medio baseado nos últimos 30 dias.', ticketMedio });
+    } catch (error: any) {
+      console.error(error);
+      res.status(400).json(error.message);
     }
   }
 }

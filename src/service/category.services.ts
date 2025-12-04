@@ -1,4 +1,4 @@
-import type { CategoryRepository } from '../repository/categoryRepository.js';
+import type { CategoryRepository } from '../repository/category.repository.js';
 
 export class CategoryService {
   constructor(private categoryRepository: CategoryRepository) {}

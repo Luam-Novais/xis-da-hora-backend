@@ -1,5 +1,5 @@
 import { notEqual } from 'assert';
-import type { DashboardRepository } from '../repository/dashboardRepository.js';
+import type { DashboardRepository } from '../repository/dashboard.repository.js';
 import { getCurrentDate } from '../utils/getCurrentDate.js';
 
 export class DashboardService {
@@ -45,15 +45,15 @@ export class DashboardService {
       throw error;
     }
   }
-  async getTicketMedio(){
+  async getTicketMedio() {
     const currentDate = getCurrentDate();
-    const finalDate = new Date(currentDate.getFullYear(), currentDate.getMonth() -1, currentDate.getDate());
+    const finalDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate());
 
     try {
-        return await this.dashboardRepository.ticketMedio(currentDate, finalDate)
+      return await this.dashboardRepository.ticketMedio(currentDate, finalDate);
     } catch (error) {
-          console.error(error);
-          throw error;
+      console.error(error);
+      throw error;
     }
   }
 }

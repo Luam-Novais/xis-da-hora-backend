@@ -1,5 +1,5 @@
 import type { IProduct, ProductImage, IEditProduct } from '../types/product.js';
-import type { ProductRepository } from '../repository/productRepository.js';
+import type { ProductRepository } from '../repository/product.repository.js';
 import { FormaterString } from '../utils/formaterString.js';
 import type { UploadApiResponse } from 'cloudinary';
 import sharp from 'sharp';
@@ -60,9 +60,9 @@ export class ProductService {
       const productExisting = await this.productRepository.findProductById(Number(productId));
       if (!productExisting) throw new HttpError(400, 'Produto não encontrado.');
       const deletedProduct = await this.productRepository.deleteProduct(Number(productId));
-      const imageURLDeleted = await this.deleteImageInCloud(deletedProduct.imageId)
-      console.log(imageURLDeleted)
-    } catch (error : any) {
+      const imageURLDeleted = await this.deleteImageInCloud(deletedProduct.imageId);
+      console.log(imageURLDeleted);
+    } catch (error: any) {
       console.error(error);
       throw new HttpError(400, error.message);
     }
@@ -81,15 +81,15 @@ export class ProductService {
       console.error(error);
     }
   }
-  private async deleteImageInCloud(public_id: string):Promise<any>{
-    return new Promise((resolve, reject)=>{
-      const destroy = cloudinary.uploader.destroy(public_id, (error, result) =>{
-        if(error){
-          console.error(error)
-          reject(error)
+  private async deleteImageInCloud(public_id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const destroy = cloudinary.uploader.destroy(public_id, (error, result) => {
+        if (error) {
+          console.error(error);
+          reject(error);
         }
-        resolve(result)
-      })
-    })
+        resolve(result);
+      });
+    });
   }
 }

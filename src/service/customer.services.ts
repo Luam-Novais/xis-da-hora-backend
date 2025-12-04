@@ -3,7 +3,7 @@ import { CustomerRepository } from '../repository/customer.repository.js';
 import { FormaterString } from '../utils/formaterString.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { HttpError } from '../error/httpError.js';
+import { HttpError } from '../error/httpError.js'
 
 const { formatString } = new FormaterString();
 export class CustomerService {
