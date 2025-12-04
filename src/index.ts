@@ -2,11 +2,10 @@ import 'dotenv/config'
 import express from 'express'
 import dotenv from 'dotenv'
 import customerRouter from './routes/customer.router.js'
-import orderRouter from './routes/orderRouter.js'
-import productRouter from './routes/productRouter.js'
-import categoryRouter from './routes/categoryRouter.js'
-import dashboardRouter from './routes/dashboardRouter.js'
-import { errorHandler } from './middleware/errorHandler.js'
+import orderRouter from './routes/order.router.js'
+import productRouter from './routes/product.router.js'
+import categoryRouter from './routes/category.router.js'
+import dashboardRouter from './routes/dashboard.router.js'
 import swaggerUi from 'swagger-ui-express'
 import { swaggerDocs } from './swagger/swagger.js'
 
@@ -20,6 +19,4 @@ app.use('/product', productRouter)
 app.use('/category', categoryRouter)
 app.use('/order', orderRouter)
 app.use('/dashboard', dashboardRouter)
-app.use(errorHandler)
-
 app.listen(3000, ()=> console.log('Servidor rodando...'))
