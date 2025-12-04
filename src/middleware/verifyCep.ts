@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { FormaterString } from '../utils/formaterString.js';
 const { formatString } = new FormaterString();
-export async function verifyCepMiddleware(req: Request, res: Response, next: NextFunction) {
+export async function verifyCep(req: Request, res: Response, next: NextFunction) {
   const { cep } = req.body;
   const cepFormated = formatString(cep).replace('-', '').replace('.', '');
   try {
