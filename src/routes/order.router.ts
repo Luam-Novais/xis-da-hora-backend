@@ -7,6 +7,6 @@ const router = Router();
 const controller = new OrderController();
 router.get('/get-orders-user', ensureAuth, (req: RequestWithJWT, res) => controller.getOrdersUser(req, res));
 router.post('/create-order', ensureAuth, (req, res) => controller.createOrder(req, res));
-router.post('/update-status/:id', ensureAdmin, (req, res) => controller.updateOrderStatus(req, res));
+router.patch('/update-status/:id', ensureAdmin, (req, res) => controller.updateOrderStatus(req, res));
 
 export default router;
